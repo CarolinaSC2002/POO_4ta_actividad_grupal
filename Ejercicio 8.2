@@ -1,0 +1,60 @@
+import ipywidgets as widgets
+from IPython.display import display, clear_output
+import math
+
+# ----- Clase lógica de Notas -----
+class Notas:
+    def __init__(self, lista_notas):
+        self.lista_notas = lista_notas
+
+    def calcular_promedio(self):
+        return sum(self.lista_notas) / len(self.lista_notas)
+
+    def calcular_desviacion(self):
+        prom = self.calcular_promedio()
+        suma = sum([(nota - prom)**2 for nota in self.lista_notas])
+        return math.sqrt(suma / len(self.lista_notas))
+
+    def obtener_mayor(self):
+        return max(self.lista_notas)
+
+    def obtener_menor(self):
+        return min(self.lista_notas)
+
+# ----- Widgets para ingresar notas -----
+inputs = [widgets.FloatText(description=f'Nota {i+1}', value=0.0, min=0.0, max=5.0) for i in range(5)]
+btn_calcular = widgets.Button(description='Calcular', button_style='success')
+btn_limpiar = widgets.Button(description='Limpiar', button_style='danger')
+
+# Etiquetas de salida
+salida_resultados = widgets.Output()
+
+# ----- Función para calcular -----
+def on_calcular_clicked(b):
+    with salida_resultados:
+        clear_output()
+        try:
+            notas_valores = [entrada.value for entrada in inputs]
+            notas = Notas(notas_valores)
+            print(f"Promedio = {notas.calcular_promedio():.2f}")
+            print(f"Desviación estándar = {notas.calcular_desviacion():.2f}")
+            print(f"Nota mayor = {notas.obtener_mayor()}")
+            print(f"Nota menor = {notas.obtener_menor()}")
+        except Exception as e:
+            print("Error:", e)
+
+# ----- Función para limpiar -----
+def on_limpiar_clicked(b):
+    for entrada in inputs:
+        entrada.value = 0.0
+    with salida_resultados:
+        clear_output()
+
+btn_calcular.on_click(on_calcular_clicked)
+btn_limpiar.on_click(on_limpiar_clicked)
+
+# ----- Mostrar todo -----
+display(widgets.HTML("<h3>Ingreso de Notas del Estudiante</h3>"))
+display(*inputs)
+display(widgets.HBox([btn_calcular, btn_limpiar]))
+display(salida_resultados)
